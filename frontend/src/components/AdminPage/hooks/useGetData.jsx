@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { buildApiUrl } from "../../../config";
 
 export const useGetData = (url = "", pageSize = 10, current = 1) => {
   const [isError, setError] = useState(false);

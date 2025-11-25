@@ -4,6 +4,7 @@ import styles from "./styles.module.scss";
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import _ from "lodash";
+import { buildApiUrl } from "../../config";
 
 const LoginForm = ({ title, role, data }) => {
   const { register, handleSubmit } = useForm();
