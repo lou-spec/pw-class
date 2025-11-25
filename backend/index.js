@@ -7,7 +7,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
 const { init } = require('./router');
-app.use('/', init(io));
+
 
 
 const config = require('./config');
@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URI || config.db, {
 
 // ==================== Express ====================
 const app = express();
-
+app.use('/', init(io));
 // Middleware para JSON e urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
