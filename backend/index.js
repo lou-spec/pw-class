@@ -8,31 +8,40 @@ const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
 
 const config = require('./config');
-const port = process.env.PORT || 3000;
-const hostname = process.env.HOSTNAME || "127.0.0.1"; // 0.0.0.0 on Render
+const router = require('./router');
 
-mongoose.connect(process.env.MONGO_URI || config.db)
-  .then(() => console.log('Connection successful!'))
-  .catch((err) => console.error(err));
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOSTNAME || '0.0.0.0'; // Render recomenda 0.0.0.0
 
-let router = require('./router');
+// ==================== Mongoose ====================
+mongoose.set('strictQuery', true);
 
-var app = express();
+mongoose.connect(process.env.MONGO_URI || config.db, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('MongoDB connection successful!'))
+.catch(err => console.error('MongoDB connection error:', err));
 
-var customContentTypeMiddleware = process.env.FRONTEND_URL || '';
+// ==================== Express ====================
+const app = express();
 
+// Middleware para JSON e urlencoded
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ==================== CORS ====================
 const allowedOrigins = [
   'http://localhost:5173',
-   'https://pwa-frontend.vercel.app',
+  'https://pwa-frontend.vercel.app',
 ].filter(Boolean);
-
-const isAllowedOrigin = (origin) =>
-  !origin || allowedOrigins.includes(origin);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
@@ -40,3 +49,47 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// ==================== Rotas ====================
+app.use('/', router);
+
+// ==================== Swagger (opcional) ====================
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'API PWA',
+      version: '1.0.0',
+      description: 'Documentação da API',
+    },
+    servers: [
+      { url: `http://localhost:${PORT}` },
+    ],
+  },
+  apis: ['./router.js'], // Ajuste se tiver mais arquivos de rotas
+};
+
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// ==================== HTTP + Socket.io ====================
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  }
+});
+
+io.on('connection', (socket) => {
+  console.log('New client connected', socket.id);
+  socket.on('disconnect', () => {
+    console.log('Client disconnected', socket.id);
+  });
+});
+
+// ==================== Start Server ====================
+server.listen(PORT, HOST, () => {
+  console.log(`Server running at http://${HOST}:${PORT}`);
+});
