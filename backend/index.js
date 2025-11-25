@@ -29,21 +29,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ==================== CORS ====================
-// Apenas a URL do seu frontend será permitida
+const customFrontendUrl = process.env.FRONTEND_URL || '';
+
 const allowedOrigins = [
-  'https://pw-class.vercel.app', // frontend oficial
-  'http://localhost:5173',       // para desenvolvimento local
-];
+  customFrontendUrl,
+  'https://pwa-frontend.vercel.app',
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) =>
+  !origin || allowedOrigins.includes(origin);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed'));
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
     }
   },
   credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
