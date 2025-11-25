@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
     req.userId = decoded.id;
     next();
   })
-  games.verifyToken(token)
+  GAMES.verifyToken(token)
   .then((decoded) => {
     req.roleUser = decoded.role;
     req.userId = decoded.id;
