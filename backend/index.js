@@ -1,13 +1,11 @@
 const express = require('express');
 const http = require('http');
 const mongoose = require('mongoose');
-const path = require('path');
 const socketIo = require('socket.io');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
 const { init } = require('./router');
-
 const config = require('./config');
 
 const PORT = process.env.PORT || 3000;
@@ -31,21 +29,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ==================== CORS ====================
+// Apenas a URL do seu frontend será permitida
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://pwa-frontend.vercel.app',
-].filter(Boolean);
+  'https://pw-class.vercel.app', // frontend oficial
+  'http://localhost:5173',       // para desenvolvimento local
+];
 
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('CORS not allowed'));
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
