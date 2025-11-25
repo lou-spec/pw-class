@@ -6,6 +6,9 @@ const socketIo = require('socket.io');
 const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
+const { init } = require('./router');
+app.use('/', init(io));
+
 
 const config = require('./config');
 const router = require('./router');
