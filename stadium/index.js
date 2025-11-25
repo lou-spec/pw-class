@@ -23,7 +23,7 @@ var customContentTypeMiddleware = process.env.FRONTEND_URL || '';
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://pwa-atp-server.vercel.app',
+   'https://pwa-frontend.vercel.app',
 ].filter(Boolean);
 
 const isAllowedOrigin = (origin) =>
