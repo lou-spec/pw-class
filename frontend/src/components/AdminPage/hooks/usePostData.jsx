@@ -8,10 +8,11 @@ export const usePostData = (url = "") => {
   // 🔹 Função adicional no mesmo estilo da imagem
   const addData = (data) => {
     setLoading(true);
-    fetch(`/api/${url}`, {
+    fetch(buildApiUrl(`/api/${url}`), {
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       method: "POST",
       body: JSON.stringify(data),
     })
@@ -37,7 +38,7 @@ export const usePostData = (url = "") => {
     try {
       const isFormData = payload instanceof FormData;
 
-      const response = await fetch(`/api/${url}`, {
+      const response = await fetch(buildApiUrl(`/api/${url}`), {
         method: "POST",
         credentials: "include",
         headers: isFormData

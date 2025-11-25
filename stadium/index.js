@@ -1,54 +1,42 @@
-const express = require("express");
-const http = require("http");
-const mongoose = require("mongoose");
-const path = require("path");
-const config = require("./config");
-const socketIo = require("socket.io");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const router = require("./router");
+const express = require('express');
+const http = require('http');
+const mongoose = require('mongoose');
+const path = require('path');
+const socketIo = require('socket.io');
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+const cors = require('cors');
 
-const hostname = "127.0.0.1";
-const port = 3000;
+const config = require('./config');
+const port = process.env.PORT || 3000;
+const hostname = process.env.HOSTNAME || "127.0.0.1"; // 0.0.0.0 on Render
 
-mongoose.set("strictQuery", true);
-mongoose
-  .connect(config.db)
-  .then(() => console.log("Connection successful!"))
+mongoose.connect(process.env.MONGO_URI || config.db)
+  .then(() => console.log('Connection successful!'))
   .catch((err) => console.error(err));
 
-const app = express();
-const server = http.Server(app);
+let router = require('./router');
 
-// ✅ Initialize Socket.IO first
-const io = socketIo(server, {
-  cors: {
-    origin: "http://*:*",
+var app = express();
+
+var customContentTypeMiddleware = process.env.FRONTEND_URL || '';
+
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://pwa-atp-server.vercel.app',
+].filter(Boolean);
+
+const isAllowedOrigin = (origin) =>
+  !origin || allowedOrigins.includes(origin);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
+    }
   },
-});
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 
-// Middleware
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
-app.options("*", cors());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use(cookieParser());
-
-// ✅ Now that 'io' exists, you can safely pass it to the router
-app.use(router.init(io));
-
-// Socket.io connection handling
-io.on("connection", (socket) => {
-  console.log("New client connected");
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-});
-
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}`);
-});
+app.use(cors(corsOptions));

@@ -6,7 +6,7 @@ export const useGetPerfil = (url = "users") => {
   const [user, setUser] = useState({ data: {} });
 
   const fetchingData = useCallback(() => {
-    const querie = `/api/${url}/perfil`;
+    const querie = buildApiUrl(`/api/${url}/perfil`);
     setLoading(true);
 
     fetch(querie, {
