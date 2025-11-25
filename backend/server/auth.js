@@ -2,10 +2,10 @@ const bodyParser = require("body-parser");
 const express = require("express");
 const Users = require("../data/users");
 const cookieParser = require('cookie-parser');
-const VerifyToken = require('../middleware/Token');
+const VerifyToken = require('../middleware/token');
 
 function AuthRouter() {
-  let router = express.Router(); // Use Router, não express()
+  let router = express.Router(); 
   router.use(require('cookie-parser')());
   router.use(bodyParser.json({ limit: "100mb" }));
   router.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
@@ -18,8 +18,6 @@ function AuthRouter() {
       return res.status(400).send({ auth: false, message: 'Invalid role or scope' });
     }
 
-    //Authorize - Bearer fjbdfbdsjkfndskf
-    //credentials: include
     Users.create(body)
       .then((result) => {
         const userObj = result.user.toObject();
