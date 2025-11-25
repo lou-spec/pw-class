@@ -8,13 +8,10 @@ const swaggerUi = require('swagger-ui-express');
 const cors = require('cors');
 const { init } = require('./router');
 
-
-
 const config = require('./config');
-const router = require('./router');
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOSTNAME || '0.0.0.0'; // Render recomenda 0.0.0.0
+const HOST = process.env.HOSTNAME || '0.0.0.0';
 
 // ==================== Mongoose ====================
 mongoose.set('strictQuery', true);
@@ -28,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI || config.db, {
 
 // ==================== Express ====================
 const app = express();
-app.use('/', init(io));
+
 // Middleware para JSON e urlencoded
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -53,8 +50,18 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// ==================== Rotas ====================
-app.use('/', router);
+// ==================== HTTP + Socket.io ====================
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ['GET', 'POST'],
+    credentials: true,
+  }
+});
+
+// Rotas passando io
+app.use('/', init(io));
 
 // ==================== Swagger (opcional) ====================
 const swaggerOptions = {
@@ -69,22 +76,13 @@ const swaggerOptions = {
       { url: `http://localhost:${PORT}` },
     ],
   },
-  apis: ['./router.js'], // Ajuste se tiver mais arquivos de rotas
+  apis: ['./router.js'],
 };
 
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ==================== HTTP + Socket.io ====================
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ['GET', 'POST'],
-    credentials: true,
-  }
-});
-
+// ==================== Socket.io events ====================
 io.on('connection', (socket) => {
   console.log('New client connected', socket.id);
   socket.on('disconnect', () => {
