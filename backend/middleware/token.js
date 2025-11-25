@@ -13,12 +13,7 @@ module.exports = (req, res, next) => {
     req.userId = decoded.id;
     next();
   })
-  GAMES.verifyToken(token)
-  .then((decoded) => {
-    req.roleUser = decoded.role;
-    req.userId = decoded.id;
-    next();
-  })
+
   .catch(() => {
     res.status(401).send({ auth: false, message: 'Not authorized' })
   })
