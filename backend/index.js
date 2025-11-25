@@ -11,7 +11,7 @@ const config = require('./config');
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOSTNAME || '0.0.0.0';
 
-// ==================== Mongoose ====================
+// ==================== MongoDB ====================
 mongoose.set('strictQuery', true);
 
 mongoose.connect(process.env.MONGO_URI || config.db, {
@@ -29,27 +29,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ==================== CORS ====================
-const customFrontendUrl = process.env.FRONTEND_URL || '';
-
 const allowedOrigins = [
-  customFrontendUrl,
-  'https://pwa-frontend.vercel.app',
-].filter(Boolean);
+  process.env.FRONTEND_URL || 'https://pw-class.vercel.app',
+  'http://localhost:5173', // desenvolvimento local
+];
 
-const isAllowedOrigin = (origin) =>
-  !origin || allowedOrigins.includes(origin);
-
-const corsOptions = {
+app.use(cors({
   origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
     }
   },
   credentials: true,
   optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
+}));
 
 // ==================== HTTP + Socket.io ====================
 const server = http.createServer(app);
@@ -79,9 +74,7 @@ const swaggerOptions = {
   },
   apis: ['./router.js'],
 };
-
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(swaggerOptions)));
 
 // ==================== Socket.io events ====================
 io.on('connection', (socket) => {

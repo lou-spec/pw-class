@@ -6,7 +6,6 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        // Suppress deprecation warnings from Bootstrap
         silenceDeprecations: ['global-builtin', 'import'],
         quietDeps: true,
       }
@@ -17,15 +16,14 @@ export default defineConfig({
       '/api': {
         target: 'https://pwa-backend-bkf1.onrender.com',
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
-
       '/socket.io': {
-        target: 'http://127.0.0.1:3000',
+        target: 'https://pwa-backend-bkf1.onrender.com',
         changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: true,
+        ws: true, // necessário para Socket.io
       },
     }
   },
