@@ -53,7 +53,7 @@ const io = socketIo(server, {
 });
 
 // Rotas passando io
-app.use('/', init(io));
+app.use('/api', init(io));
 
 // ==================== Swagger (opcional) ====================
 const swaggerOptions = {
