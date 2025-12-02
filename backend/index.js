@@ -9,8 +9,8 @@ const { init } = require('./router');
 const config = require('./config');
 
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOSTNAME || '0.0.0.0';
-
+//const HOST = process.env.HOSTNAME || '0.0.0.0';
+const hostname = ("RENDER" in process.env) ? "0.0.0.0" : "localhost";
 // ==================== MongoDB ====================
 mongoose.set('strictQuery', true);
 
@@ -81,6 +81,6 @@ io.on('connection', (socket) => {
 });
 
 // ==================== Start Server ====================
-server.listen(PORT, HOST, () => {
-  console.log(`Server running at http://${HOST}:${PORT}`);
+server.listen(PORT, hostname, () => {
+  console.log(`Server running at http://${hostname}:${PORT}`);
 });
