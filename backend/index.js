@@ -27,7 +27,9 @@ const app = express();
 
 // ==================== CORS ====================
 const allowedOrigins = [
-  process.env.FRONTEND_URL || '', 'https://pw-class.vercel.app' // desenvolvimento local
+  'https://pw-class.vercel.app',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
 ].filter(Boolean);
 
 app.use(cors({
