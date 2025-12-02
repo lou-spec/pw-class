@@ -41,12 +41,7 @@ function AuthRouter() {
       })
       .then((response) => {
         // The httpOnly: true setting means that the cookie can't be read using JavaScript but can still be sent back to the server in HTTP requests
-        res.cookie("token", response.token, {
-          httpOnly: false,
-          secure: process.env.NODE_ENV === 'production',  // true em produção (HTTPS)
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-          path: "/",                  // cookie disponível em todas as rotas
-        });
+        res.cookie("token", response.token, { httpOnly: true, secure: 'true', sameSite: 'none' });
         res.status(200);
         res.send(response);
       })

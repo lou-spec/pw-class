@@ -23,12 +23,12 @@ export default defineConfig({
         target: 'https://pwa-backend-bkf1.onrender.com',
         changeOrigin: true,
         secure: true,
-        ws: true, // necessário para Socket.io
+        ws: true,
       },
     }
   },
   build: {
-    outDir: 'build',
+    outDir: 'build',  
   },
   test: {
     globals: true,
