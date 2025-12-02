@@ -30,7 +30,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // ==================== CORS ====================
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://pw-class.vercel.app',
+  process.env.FRONTEND_URL, 'https://pw-class.vercel.app',
   'http://localhost:5173', // desenvolvimento local
 ];
 

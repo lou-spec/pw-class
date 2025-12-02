@@ -56,7 +56,7 @@ function AuthRouter() {
   router.use(VerifyToken);
 
   router.route("/logout").get(function (req, res, next) {
-    res.cookie("token", req.cookies.token, { httpOnly: true, maxAge: 0 });
+    res.cookie("token", response.token, { httpOnly: true, secure: 'true', sameSite: 'none' });
     res.status(200);
     res.send({ logout: true });
     next();
