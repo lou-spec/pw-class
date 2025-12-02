@@ -24,15 +24,11 @@ mongoose.connect(process.env.MONGO_URI || config.db, {
 // ==================== Express ====================
 const app = express();
 
-// Middleware para JSON e urlencoded
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // ==================== CORS ====================
 const allowedOrigins = [
-  process.env.FRONTEND_URL, 'https://pw-class.vercel.app',
-  'http://localhost:5173', // desenvolvimento local
-];
+  process.env.FRONTEND_URL || '', 'https://pw-class.vercel.app' // desenvolvimento local
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
